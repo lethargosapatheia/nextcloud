@@ -1,8 +1,10 @@
 version: '3.8'
 
 volumes:
-  nextcloud:
-  db:
+  next-data:
+    name: "next-data"
+  next-db:
+    name: "next-db"
 
 networks:
   next-intern:
@@ -12,10 +14,11 @@ services:
   db:
     image: mariadb:10.5
     build: db
+    container_name: next-db
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
     volumes:
-      - db:/var/lib/mysql
+      - next-db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_PASSWORD=password
@@ -34,10 +37,11 @@ services:
   app:
     image: nextcloud
     build: app
+    container_name: next-app
     ports:
       - 8080:8080
     volumes:
-      - nextcloud:/var/www/html
+      - next-data:/var/www/html
     restart: always
     cap_drop:
       - ALL
