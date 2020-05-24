@@ -15,5 +15,5 @@ Without the CHOWN capability, this is going to return an error anyway if any of 
 
 Nextcloud Application
 ---
-Because Nextcloud runs an rsync the first time and changes the owner of files, it needs additional capabilities, such as DAC_OVERRIDE, CHOWN, besides SETGID and SETUID:
+Because Nextcloud runs an rsync the first time and changes the owner of files, it needs additional capabilities, such as DAC_OVERRIDE, CHOWN, besides SETGID and SETUID:<br/>
 https://github.com/nextcloud/docker/blob/master/18.0/apache/entrypoint.sh#L100-L106
