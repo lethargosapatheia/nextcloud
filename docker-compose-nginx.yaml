@@ -1,0 +1,29 @@
+version: '3.8'
+
+volumes:
+  letsencrypt:
+    name: "letsencrypt"
+
+networks:
+  frontend:
+    name: "frontend"
+
+services:
+  nginx-proxy:
+    image: nginx:1.19
+    build: nginx-proxy
+    container_name: nginx-proxy
+    env_file:
+      - nginx-proxy/nginx.env
+    volumes:
+      - letsencrypt:/etc/letsencrypt/ 
+    cap_drop:
+      - ALL
+    cap_add:
+      - dac_override
+      - chown
+      - setgid
+      - setuid
+      - net_bind_service
+    networks:
+      - frontend

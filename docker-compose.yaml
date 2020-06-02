@@ -9,6 +9,8 @@ volumes:
 networks:
   next-intern:
     name: "next-intern"
+  frontend:
+    name: "frontend"
 
 services:
   db:
@@ -27,7 +29,7 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - dac_read_search
+      - dac_override
       - setgid
       - setuid
 
@@ -38,8 +40,6 @@ services:
     image: nextcloud
     build: app
     container_name: next-app
-    ports:
-      - 8080:8080
     volumes:
       - next-data:/var/www/html
     restart: always
@@ -52,3 +52,4 @@ services:
       - setuid
     networks:
       - next-intern
+      - frontend
