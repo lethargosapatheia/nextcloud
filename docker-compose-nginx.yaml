@@ -17,6 +17,9 @@ services:
       - nginx-proxy/nginx.env
     volumes:
       - letsencrypt:/etc/letsencrypt/ 
+    ports:
+      - 80:80
+      - 443:443
     cap_drop:
       - ALL
     cap_add:

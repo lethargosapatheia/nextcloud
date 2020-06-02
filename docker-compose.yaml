@@ -42,6 +42,10 @@ services:
     container_name: next-app
     volumes:
       - next-data:/var/www/html
+    environment:
+      - APACHE_DISABLE_REWRITE_IP=1
+      - OVERWRITEHOST=nginx-proxy
+      - OVERWRITEPROTOCOL=https
     restart: always
     cap_drop:
       - ALL

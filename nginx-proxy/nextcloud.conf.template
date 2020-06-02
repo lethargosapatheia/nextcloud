@@ -1,0 +1,98 @@
+server {
+    # listen on port 80 (ipv4 by default)
+    listen 80;
+
+    # server name for virtual host resolution
+    server_name ${MAIN_HOSTNAME};
+
+    # location for letsencrypt ACME challenge on renewals
+    location /.well-known {
+        alias /var/www/html/.well-known;
+        allow all;
+    }
+
+    # redirect all requests to the respective https address
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+}
+
+server {
+    # listen on port 443 (ipv4 by default)
+    listen 443 ssl http2;
+
+    # server name for virtual host resolution
+    server_name ${MAIN_HOSTNAME};
+
+    # max body size (dependent on application needs)
+    client_max_body_size 100M;
+
+    # delete/hide header from proxied webserver
+    proxy_hide_header X-Powered-By;
+    # cache ssl cert on client for 2 years including subdomains
+    proxy_hide_header Strict-Transport-Security;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains" always;
+    # tell client to only load from this server (self)
+    proxy_hide_header Content-Security-Policy;
+    add_header Content-Security-Policy "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline'" always;
+    # tell client to only allow open frame from same origin
+    proxy_hide_header X-Frame-Options;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    # tell client to stop rendering page if xss is detected
+    proxy_hide_header X-XSS-Protection;
+    add_header X-XSS-Protection "1; mode=block" always;
+    # tell client to not guess the file type itself but trust the servers answer
+    proxy_hide_header X-Content-Type-Options;
+    add_header X-Content-Type-Options "nosniff" always;
+    # tell client to never send any referrer when clicking links
+    proxy_hide_header Referrer-Policy;
+    add_header Referrer-Policy "same-origin" always;
+    # tell robots not to index and follow this website
+    proxy_hide_header X-Robots-Tag;
+    add_header X-Robots-Tag "none" always;
+    # restrict use of browser features in its own frame
+    proxy_hide_header Feature-Policy;
+    add_header Feature-Policy "microphone 'none'; payment 'none'; sync-xhr 'self'" always;
+    # tell plugins (like adobe flash) to prevent loading content from site
+    proxy_hide_header X-Permitted-Cross-Domain-Policies;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
+    # tell the client to not directly open downloads
+    proxy_hide_header X-Download-Options;
+    add_header X-Download-Options "noopen" always;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Port $server_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    proxy_http_version 1.1;
+    proxy_redirect off;
+    proxy_buffering off;
+
+    # websocket stuff
+    #proxy_set_header Upgrade $http_upgrade;
+    #proxy_set_header Connection $connection_upgrade;
+    proxy_read_timeout 900s;
+
+    # certs
+    ssl_certificate ${CERT_PATH};
+    ssl_certificate_key ${KEY_PATH};
+
+    #include tls_security.include;
+    #include errorpages.include;
+    set $backend ${BACKEND};
+
+    location / { 
+      resolver 127.0.0.11 valid=30s;
+      proxy_pass $backend;
+    }
+
+    location /.well-known/carddav {
+    return 301 $scheme://$backend/remote.php/dav;
+    }
+    
+    location /.well-known/caldav {
+        return 301 $scheme://$backend/remote.php/dav;
+    }
+
+}
