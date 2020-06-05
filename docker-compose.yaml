@@ -13,7 +13,7 @@ networks:
     name: "frontend"
 
 services:
-  db:
+  next-db:
     image: mariadb:10.5
     build: db
     container_name: next-db
@@ -21,11 +21,8 @@ services:
     restart: always
     volumes:
       - next-db:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+    env_file:
+      - .mariadb.env
     cap_drop:
       - ALL
     cap_add:
@@ -36,16 +33,16 @@ services:
     networks:
       - next-intern
     
-  app:
+  next-app:
     image: nextcloud
     build: app
     container_name: next-app
     volumes:
       - next-data:/var/www/html
-    environment:
-      - APACHE_DISABLE_REWRITE_IP=1
-      - OVERWRITEHOST=nginx-proxy
-      - OVERWRITEPROTOCOL=https
+   # environment:
+   #   - APACHE_DISABLE_REWRITE_IP=1
+   #   - OVERWRITEHOST=nginx-proxy
+   #   - OVERWRITEPROTOCOL=https
     restart: always
     cap_drop:
       - ALL
