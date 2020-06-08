@@ -1,0 +1,20 @@
+# restrict ssl versions to tls 1.2 and recent 1.3
+ssl_protocols TLSv1.3 TLSv1.2;
+
+# prefer the ciphers of the server in the given order of the following list
+ssl_prefer_server_ciphers on;
+
+# restrict allowed ciphers to those listed in the BSI technical guideline (first 2 are TLS1.3 ciphers, see "openssl ciphers -v")
+ssl_ciphers TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-CCM:DHE-RSA-AES128-CCM;
+
+# preferred elliptic curves (cf. 3.3.2), in order of preference (cf. 3.6.2) (see "openssl ecparam -list_curves")
+ssl_ecdh_curve brainpoolP512r1:brainpoolP384r1:brainpoolP256r1:secp521r1:secp384r1:prime256v1;
+
+# preferred Diffie-Hellman groups (cf. 3.3.2)
+# The groups ffdhe2048, ffdhe3072 and ffdhe4096 can be obtained from
+# https://wiki.mozilla.org/Security/Server_Side_TLS#Pre-defined_DHE_groups
+ssl_dhparam /etc/nginx/ffdhe4096.pem;
+
+# enable ocsp stapling
+ssl_stapling on;
+ssl_stapling_verify on;
