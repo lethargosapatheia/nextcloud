@@ -1,5 +1,5 @@
 # restrict ssl versions to tls 1.2 and recent 1.3
-ssl_protocols TLSv1.3 TLSv1.2;
+ssl_protocols TLSv1.3;
 
 # prefer the ciphers of the server in the given order of the following list
 ssl_prefer_server_ciphers on;

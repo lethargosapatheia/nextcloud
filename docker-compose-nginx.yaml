@@ -3,6 +3,8 @@ version: '3.8'
 volumes:
   letsencrypt:
     name: "letsencrypt"
+  www:
+    name: "www"
 
 networks:
   frontend:
@@ -13,10 +15,12 @@ services:
     image: nginx:1.19
     build: nginx-proxy
     container_name: nginx-proxy
+    restart: always
     env_file:
       - nginx-proxy/nginx.env
     volumes:
       - letsencrypt:/etc/letsencrypt/ 
+      - www:/var/www/html
     ports:
       - 80:80
       - 443:443

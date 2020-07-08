@@ -34,7 +34,7 @@ services:
       - next-intern
     
   next-app:
-    image: nextcloud
+    image: nextcloud:19.0-apache
     build: app
     container_name: next-app
     volumes:
